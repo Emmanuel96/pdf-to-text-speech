@@ -1,24 +1,38 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
-
-import { useColorScheme } from '@/hooks/use-color-scheme';
-
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
+import { Ionicons } from "@expo/vector-icons";
+import { Stack, Tabs } from "expo-router";
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
-  );
+    <Tabs screenOptions={{headerShown: true, tabBarActiveTintColor: '#ff6f00'}}>
+      <Tabs.Screen
+      name="index"
+      options={{
+        title: 'Home',
+        tabBarIcon: ({color, size}) => (
+          <Ionicons name="document-text" size={size} color={color}/>
+        ),
+      }}
+      />
+
+      <Tabs.Screen
+      name="player"
+      options={{
+        title: 'AudioPlayer',
+        tabBarIcon: ({color, size}) => (
+          <Ionicons name="play-circle" size={size} color={color}/>
+        ),
+      }}
+      />
+
+      <Tabs.Screen
+      name="bookmarks"
+      options={{
+        title: "Bookmarks",
+        tabBarIcon: ({color, size}) => (
+          <Ionicons name="bookmark" size={size} color={color}/>
+        )
+      }}
+      />
+    </Tabs>
+  )
 }
