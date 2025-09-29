@@ -1,23 +1,72 @@
+import React, { useEffect, useState } from "react";
+import { View, FlatList } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
 import BookMarkCard from "@/assets/components/BookmarkCard";
-import { ScrollView } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 
+type Bookmark = {
+  id: string;
+  index: number;
+  timestamp: string;
+  snippet: string;
+};
 
-export default function BookMark() {
-    //populated with dummy data first
-    const bookmarks = [
-        {timestamp: "00:01:30", snippet: 'This is the first saved snippet'},
-        {timestamp: "00:05:45", snippet: 'Another important passage'}
-    ];
+export default function BookmarksScreen() {
+  const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
+  const router = useRouter();
 
-    return (
-        <ScrollView style={{flex: 1, padding: 16}} contentContainerStyle={{paddingBottom: 40}}>
-            {bookmarks.map((bm, i) => (
-                <BookMarkCard
-                key={i}
-                timestamp={bm.timestamp}
-                snippet={bm.snippet}
-                />
-            ))}
-        </ScrollView>
-    )
+useFocusEffect(
+  React.useCallback(() => {
+    let isActive = true;
+
+    const fetchBookmarks = async () => {
+      try {
+        const data = await AsyncStorage.getItem("@bookmarks");
+        if (data && isActive) {
+          const parsed: Omit<Bookmark, "id">[] = JSON.parse(data);
+
+          // ensure every bookmark has a unique id
+          const withIds: Bookmark[] = parsed.map((bm, idx) => ({
+            ...bm,
+            id: `${bm.index}-${idx}-${bm.timestamp}`,
+          }));
+
+          setBookmarks(withIds);
+        }
+      } catch (err) {
+        console.error("Failed to load bookmarks", err);
+      }
+    };
+
+    fetchBookmarks();
+
+    return () => {
+      isActive = false; 
+    };
+  }, []) 
+);
+
+  const handleGoToBookmark = (bm: Bookmark) => {
+    router.push({
+      pathname: "/player",
+      params: { bookmarkIndex: String(bm.index) },
+    });
+  };
+
+  return (
+    <View style={{ flex: 1, padding: 16 }}>
+      <FlatList
+        data={bookmarks}
+        keyExtractor={(item) => item.id} 
+        renderItem={({ item }) => (
+          <BookMarkCard
+            timestamp={item.timestamp}
+            snippet={item.snippet}
+            onPress={() => handleGoToBookmark(item)}
+          />
+        )}
+      />
+    </View>
+  );
 }
