@@ -64,7 +64,7 @@ export default function PlayerScreen() {
     setBookmarks(stored ? JSON.parse(stored) : []);
   };
 
-  // ✅ jump to bookmark if passed in
+  // jump to bookmark if passed in
   useEffect(() => {
     if (!bookmarkIndex) return;
     if (!chunks.length) return;
@@ -79,7 +79,7 @@ export default function PlayerScreen() {
     playChunk(idx, 0);
   }, [bookmarkIndex, chunks]);
 
-  // ✅ recompute durations when chunks change
+  // recompute durations when chunks change
   useEffect(() => {
     if (!chunks.length) {
       durationsRef.current = [];
@@ -233,7 +233,8 @@ export default function PlayerScreen() {
     id: Date.now().toString(), // 👈 unique id
     index: currentIndex,
     timestamp: formatTime(position),
-    snippet: chunks[currentIndex]?.slice(0, 80) + "...",
+    snippet: chunks[currentIndex]?.slice(0, 150) + "...",
+    notes: [],
   };
 
   try {
